@@ -1,3 +1,4 @@
+//Imports
 import enums.PostAlertStates;
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.FsmModel;
@@ -12,44 +13,54 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 
+
+//Post Functionality class used to test the post functionality of the system
 public class PostFunctionality implements FsmModel {
+    //System Under Test
     private SUT systemUnderTest = new SUT();
 
+    //State of the system
     private PostAlertStates state = PostAlertStates.INITIAL_STATE;
     @Override
     public Object getState() {
         return state;
     }
 
+    //Reset the system
     @Override
-    public void reset(boolean b) {
-        if(b){
+    public void reset(boolean reset) {
+        if(reset){
             systemUnderTest = new SUT();
         }
         state = PostAlertStates.INITIAL_STATE;
     }
 
+    //Transitions
     public boolean SuccessfulPost(){
         state = PostAlertStates.POSTALERT;
         System.out.println("Successful Post");
         return getState().equals(PostAlertStates.INITIAL_STATE);
     }
+    //Action to post successfully
     public @Action void ValidPostRequest() throws Exception {
         state = PostAlertStates.POSTALERT;
         System.out.println("Successful Post");
         assertTrue(SUT.PostRequest(true));
     }
 
+    //Transitions
     public boolean FailedPostRequest(){
         System.out.println("Failed Post");
         return getState().equals(PostAlertStates.INITIAL_STATE);
     }
+    //Action to post unsuccessfully
     public @Action void FailedPost() throws Exception {
         System.out.println("Failed Post");
         state = PostAlertStates.BADSTATE;
         assertFalse(SUT.PostRequest(false));
     }
 
+    //Testing the View Alerts functionality Test Runner
     @Test
     public void PostTesterRunner() {
         final GreedyTester tester = new GreedyTester(new PostFunctionality());

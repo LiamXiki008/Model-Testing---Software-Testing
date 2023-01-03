@@ -1,3 +1,4 @@
+//Imports
 import enums.LoginStates;
 import nz.ac.waikato.modeljunit.Action;
 import nz.ac.waikato.modeljunit.FsmModel;
@@ -8,19 +9,22 @@ import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
 import org.junit.Test;
 import java.util.Random;
-
 import static org.junit.Assert.*;
 
+//Login Functionality class used to test the login functionality of the system
 public class LoginFunctionality implements FsmModel {
 
+    //System Under Test
     private SUT systemUnderTest = new SUT();
 
+    //State of the system
     private LoginStates state = LoginStates.INITIAL_STATE;
     @Override
     public Object getState() {
         return state;
     }
 
+    //Reset the system
     @Override
     public void reset(boolean reset) {
         if(reset){
@@ -30,25 +34,29 @@ public class LoginFunctionality implements FsmModel {
     }
 
     //Transitions
-    public boolean loginFunctionGuard(){
+    public boolean successfulLoginGuard(){
         System.out.println("Login Successful");
         return getState().equals(LoginStates.VALIDLOGIN);
     }
+    //Action to login successfully
     public @Action void loginFunction() {
         System.out.println("Viewing Alerts");
         state = LoginStates.VIEWALERTS;
         assertTrue(SUT.LoginFunction(true));
     }
 
-    public boolean loginFailedFunction(){
+    //Transitions
+    public boolean loginFailedFunctionGuard(){
         System.out.println("Login Failed");
         return getState().equals(LoginStates.INVALIDLOGIN);
     }
+    //Action to login unsuccessfully
     public @Action void loginFunctionFailed(){
         System.out.println("Login Failed");
         assertFalse(SUT.LoginFunction(false));
     }
 
+    //Testing the View Alerts functionality
     public boolean logoutFromAlertScreen(){
         return  getState().equals(LoginStates.VIEWALERTS);
     }
@@ -57,6 +65,7 @@ public class LoginFunctionality implements FsmModel {
         assertTrue(SUT.LogoutFunction());
     }
 
+    //Test Runner
     @Test
     public void LoginTesterRunner() {
         final GreedyTester tester = new GreedyTester(new LoginFunctionality()); //Creates a test generator that can generate random walks. A greedy random walk gives preference to transitions that have never been taken before. Once all transitions out of a state have been taken, it behaves the same as a random walk.
@@ -66,8 +75,8 @@ public class LoginFunctionality implements FsmModel {
         tester.addListener("verbose"); //This gives you printed statements of the transitions being performed along with the source and destination states.
         tester.addCoverageMetric(new TransitionPairCoverage()); //Records the transition pair coverage i.e. the number of paired transitions traversed during the execution of the test.
         tester.addCoverageMetric(new StateCoverage()); //Records the state coverage i.e. the number of states which have been visited during the execution of the test.
-        tester.addCoverageMetric(new ActionCoverage()); //Records the number of @Action methods which have ben executed during the execution of the test.
-        tester.generate(5); //Generates 500 transitions
+        tester.addCoverageMetric(new ActionCoverage()); //Records the number of @Action methods which have been executed during the execution of the test.
+        tester.generate(5); //Generates transitions
         tester.printCoverage(); //Prints the coverage metrics specified above.
     }
 }
