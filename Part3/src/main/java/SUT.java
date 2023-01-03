@@ -2,6 +2,7 @@
 import com.google.gson.Gson;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import java.net.HttpURLConnection;
 
@@ -11,7 +12,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 
 //System Under Test
@@ -170,5 +173,57 @@ public class SUT {
         String title = driver.getTitle();
         driver.quit();
         return title.contains("Home Page");
+    }
+
+    public static boolean isLoggedIn(){
+        return  browser.findElement(By.xpath("//a[@href='/Home/Logout']")).isDisplayed();
+    }
+
+    public static boolean viewAlerts(boolean loggedIn){
+        if(loggedIn) {
+            browser.get("https://www.marketalertum.com/Alerts/List");
+        }else{
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkLimit() {
+        if (isLoggedIn()) {
+            browser.get("https://www.marketalertum.com/Alerts/List");
+            List<WebElement> alerts = browser.findElements(By.xpath("//table[@border='1']"));
+            System.out.println("Number of alerts: " + alerts.size());
+
+            return alerts.size() >= 5;
+        }
+        return false;
+    }
+
+    public String getEventLog(){
+        //Get request
+        try {
+            URL url = new URL("https://api.marketalertum.com/EventsLog/aba2df1c-5441-4581-9dc2-5413c9691825");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type","application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            try(BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))){
+                StringBuilder response = new StringBuilder();
+                String respondLine = null;
+                while ((respondLine = br.readLine()) != null){
+                    response.append(respondLine.trim());
+                }
+                System.out.println(response.toString());
+                return response.toString();
+            }catch(IOException e){
+                return "Error";
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

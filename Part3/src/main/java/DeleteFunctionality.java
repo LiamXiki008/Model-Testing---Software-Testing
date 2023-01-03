@@ -13,8 +13,6 @@ import static org.junit.Assert.assertEquals;
 
 //Delete Functionality class used to test the delete functionality of the system
 public class DeleteFunctionality implements FsmModel {
-    //System Under Test
-    private SUT sut = new SUT();
 
     //State of the system
     private DeleteAlertStates state = DeleteAlertStates.INITIAL_STATE;
@@ -27,18 +25,19 @@ public class DeleteFunctionality implements FsmModel {
     @Override
     public void reset(boolean reset) {
         if(reset){
-            sut = new SUT();
+            //System Under Test
+            SUT sut = new SUT();
         }
         state = DeleteAlertStates.INITIAL_STATE;
     }
 
     //Transitions
-    public boolean DeleteAlerts(){
+    public boolean DeleteAlertsGuard(){
         System.out.println("Alerts Deleted");
         return getState().equals(DeleteAlertStates.INITIAL_STATE);
     }
     //Action to delete alerts
-    public @Action void SuccessfulDeleteRequest() {
+    public @Action void DeleteAlerts() {
         System.out.println("Successful delete request");
         //state = DeleteAlertStates.DELETEALERTS;
         assertEquals(200,SUT.DeleteRequest("aba2df1c-5441-4581-9dc2-5413c9691825"));
@@ -46,12 +45,12 @@ public class DeleteFunctionality implements FsmModel {
     }
 
     //Transitions
-    public boolean InvalidDelete(){
+    public boolean InvalidDeleteGuard(){
         System.out.println("Invalid Delete");
         return getState().equals(DeleteAlertStates.INITIAL_STATE);
     }
     //Action to delete unsuccessfully
-    public @Action void FailedDelete(){
+    public @Action void InvalidDelete(){
         state = DeleteAlertStates.BADSTATE;
         System.out.println("Failed Delete Request");
         assertEquals(400,SUT.DeleteRequest("InvalidId"));
@@ -68,7 +67,7 @@ public class DeleteFunctionality implements FsmModel {
         tester.addCoverageMetric(new TransitionPairCoverage());
         tester.addCoverageMetric(new StateCoverage());
         tester.addCoverageMetric(new ActionCoverage());
-        tester.generate(4);
+        tester.generate(100);
         tester.printCoverage();
     }
 }

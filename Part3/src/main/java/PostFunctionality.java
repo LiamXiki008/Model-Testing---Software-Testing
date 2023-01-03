@@ -36,20 +36,20 @@ public class PostFunctionality implements FsmModel {
     }
 
     //Transitions
-    public boolean SuccessfulPost(){
-        state = PostAlertStates.POSTALERT;
+    public boolean SuccessfulPostGuard(){
         System.out.println("Successful Post");
         return getState().equals(PostAlertStates.INITIAL_STATE);
     }
     //Action to post successfully
     public @Action void ValidPostRequest() throws Exception {
+        SUT.checkLimit();
         state = PostAlertStates.POSTALERT;
         System.out.println("Successful Post");
         assertTrue(SUT.PostRequest(true));
     }
 
     //Transitions
-    public boolean FailedPostRequest(){
+    public boolean FailedPostRequestGuard(){
         System.out.println("Failed Post");
         return getState().equals(PostAlertStates.INITIAL_STATE);
     }
@@ -71,7 +71,7 @@ public class PostFunctionality implements FsmModel {
         tester.addCoverageMetric(new TransitionPairCoverage());
         tester.addCoverageMetric(new StateCoverage());
         tester.addCoverageMetric(new ActionCoverage());
-        tester.generate(5);
+        tester.generate(100);
         tester.printCoverage();
     }
 }

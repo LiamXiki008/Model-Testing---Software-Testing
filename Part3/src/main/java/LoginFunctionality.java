@@ -7,15 +7,13 @@ import nz.ac.waikato.modeljunit.StopOnFailureListener;
 import nz.ac.waikato.modeljunit.coverage.ActionCoverage;
 import nz.ac.waikato.modeljunit.coverage.StateCoverage;
 import nz.ac.waikato.modeljunit.coverage.TransitionPairCoverage;
+import org.junit.Assert;
 import org.junit.Test;
 import java.util.Random;
 import static org.junit.Assert.*;
 
 //Login Functionality class used to test the login functionality of the system
 public class LoginFunctionality implements FsmModel {
-
-    //System Under Test
-    private SUT systemUnderTest = new SUT();
 
     //State of the system
     private LoginStates state = LoginStates.INITIAL_STATE;
@@ -28,7 +26,8 @@ public class LoginFunctionality implements FsmModel {
     @Override
     public void reset(boolean reset) {
         if(reset){
-            systemUnderTest = new SUT();
+            //System Under Test
+            SUT systemUnderTest = new SUT();
         }
         state = LoginStates.INITIAL_STATE;
     }
@@ -43,6 +42,7 @@ public class LoginFunctionality implements FsmModel {
         System.out.println("Viewing Alerts");
         state = LoginStates.VIEWALERTS;
         assertTrue(SUT.LoginFunction(true));
+        assertTrue(SUT.viewAlerts(true));
     }
 
     //Transitions
@@ -63,6 +63,14 @@ public class LoginFunctionality implements FsmModel {
     public @Action void logoutFunction(){
         state = LoginStates.INITIAL_STATE;
         assertTrue(SUT.LogoutFunction());
+        assertFalse(SUT.viewAlerts(false));
+    }
+
+    //Testing the View Alerts functionality Test Runner
+    public @Action void viewAlertsFunction(){
+        boolean loggedIn = SUT.isLoggedIn();
+        state = LoginStates.VIEWALERTS;
+        assertTrue(SUT.viewAlerts(loggedIn));
     }
 
     //Test Runner
@@ -76,7 +84,7 @@ public class LoginFunctionality implements FsmModel {
         tester.addCoverageMetric(new TransitionPairCoverage()); //Records the transition pair coverage i.e. the number of paired transitions traversed during the execution of the test.
         tester.addCoverageMetric(new StateCoverage()); //Records the state coverage i.e. the number of states which have been visited during the execution of the test.
         tester.addCoverageMetric(new ActionCoverage()); //Records the number of @Action methods which have been executed during the execution of the test.
-        tester.generate(5); //Generates transitions
+        tester.generate(100); //Generates transitions
         tester.printCoverage(); //Prints the coverage metrics specified above.
     }
 }
